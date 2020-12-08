@@ -46,7 +46,7 @@ export default class ListTodoComponent extends Component{
     }
 
     Updatetodo(id){
-      console.log(id)
+ 
       this.props.history.push(`/Todo/${id}`)
       // let userName = AuthenticationService.Getusername();
  
