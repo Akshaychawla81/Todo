@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Container from '@material-ui/core/Container';
 import { FormControl,InputLabel,Input,FormHelperText } from '@material-ui/core';
+import { Form , Col, Row} from "react-bootstrap";
 
 
 
@@ -16,8 +17,8 @@ constructor(props)
 
     this.state={
 
-        id: this.props.id,
-        despciption : 'Testing',
+        id: '',
+        despciption : this.props.despciption,
         targetdate : moment(new Date()).format('yyyy-mm-dd')
 
 
@@ -25,12 +26,27 @@ constructor(props)
 }
 render()    { 
     return (
-<FormControl>
-  <InputLabel htmlFor="my-input">Email address</InputLabel>
-  <Input id="my-input" aria-describedby="my-helper-text" />
-  <FormHelperText id="my-helper-text">We'll never share your email.</FormHelperText>
-</FormControl>
-      );
+<>
+{console.log(this.state.despciption)}
+<Form>
+<Form.Group as={Row} controlId="formHorizontalEmail">
+    <Form.Label column sm={2}>
+      ID
+    </Form.Label>
+    <Col sm={10}>
+    <Form.Control plaintext readOnly defaultValue={this.state.id} />
+    </Col>
+  </Form.Group>
+  <Form.Group as={Row} controlId="formHorizontalEmail">
+    <Form.Label column sm={2}>
+      Description
+    </Form.Label>
+    <Col sm={10}>
+      <Form.Control type="input" value={this.state.despciption} placeholder="Description" />
+    </Col>
+  </Form.Group>
+</Form>    
+</> );
 }
 
 }
