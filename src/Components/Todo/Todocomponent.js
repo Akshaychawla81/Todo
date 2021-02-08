@@ -1,11 +1,9 @@
 import React ,{Component } from "react";    
 import moment from 'moment'
-import { withStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Container from '@material-ui/core/Container';
-import { FormControl,InputLabel,Input,FormHelperText } from '@material-ui/core';
-import { Form , Col, Row,Button} from "react-bootstrap";
-
+import { Form , Col, Row,Button,Alert} from "react-bootstrap";
+import TodoService from "../../API/TODO/TodoService";
+import AuthenticationService from './AuthenticationService';
+import { Event } from "@material-ui/icons";
 
 
 class Todocomponent extends Component{
@@ -17,37 +15,109 @@ constructor(props)
 
     this.state={
 
-        id: '',
-        despciption : this.props.despciption,
-        targetdate : moment(new Date()).format('yyyy-mm-dd')
+        id: ' ',
+        description : '' ,
+        targetdate :moment(new Date()).format("DD-MM-YYYY"),
+        Successsfull:false  ,
+        done : ''
+
 
 
     }
+    
+    this.onsubmit=this.onsubmit.bind(this)
 }
+onsubmit(values){
+  let userName = AuthenticationService.Getusername();
+  
+
+  let todo ={"description":this.state.description,"tagetdate":this.state.targetdate,"id":this.state.id, done:this.state.done}
+
+
+  if(this.state.id===-1){
+    TodoService.AddTodoService(userName,todo)
+    .then(() =>this.setState({ Successsfull:true }))
+    
+  }
+  else
+  {
+ TodoService.UpdateTodoService(userName,this.state.id, todo )
+ .then(() =>this.setState({ Successsfull:true })
+ ,
+ Response =>alert(Response))
+  }
+
+
+
+
+}
+
+
+
+componentDidMount(){
+
+  let userName = AuthenticationService.Getusername();
+  let ID = this.props.match.params.id;
+  console.log(userName);
+
+  if(ID!=-1){
+  TodoService.GetTodoID(userName,ID)
+  .then(response => {
+
+    
+    this.setState({
+      id:ID,
+      description :response.data.description, 
+      targetdate : moment(response.data.tagetdate).format("YYYY-MM-DD"),
+      done : response.data.done
+    })
+  })
+}}
 render()    { 
+
     return (
 <>
-{console.log(this.state.despciption)}
-<Form>
-<Form.Group as={Row} controlId="formHorizontalEmail">
-    <Form.Label column sm={2}>
-      ID
-    </Form.Label>
-    <Col sm={10}>
-    <Form.Control plaintext readOnly defaultValue={this.state.id} />
-    </Col>
-  </Form.Group>
+
+ {this.state.Successsfull &&<Alert variant='success'>Successfully submitted</Alert>
+
+ }
+<Form onSubmit={this.onsubmit}>
+    <h2>TODO</h2>
   <Form.Group as={Row} controlId="formHorizontalEmail">
     <Form.Label column sm={2}>
       Description
     </Form.Label>
     <Col sm={10}>
-      <Form.Control type="input" value={this.state.despciption} placeholder="Description" />
+    < Form.Control        
+            type="text"
+           name="Description"  
+        
+            defaultValue={this.state.description} 
+            onChange = {(event) => this.setState({description: event.target.value })}
+        />
     </Col>
   </Form.Group>
-  <Button variant="success">Success</Button>
+  <Form.Group as={Row} controlId="formHorizontalEmail">
+    <Form.Label column sm={2}>
+      Target Date
+    </Form.Label>
+    <Col sm={10}>
+     
+    {/* {this.state.id==-1 &&<Form.Control   type="Date" name="targetdate"  onChange = {(event) => this.setState({targetdate: event.target.value })}   />}
+     */}
+    
+    {this.state.id!=-1 && <Form.Control   type="Date" name="targetdate"  value={this.state.targetdate} onChange = {(event) => this.setState({targetdate: event.target.value })}/>}
+    
+    </Col>
+  </Form.Group>
+  <Form.Group controlId="formBasicCheckbox">
+  
+   <Form.Check type="checkbox" label="Done"  onClick = {(event)=> this.setState({ done: event.target.checked })}/>
+  
+  </Form.Group>
+  <Button variant="success"  type="submit">Save</Button>
 </Form>    
-</> );
+</>);
 }
 
 }

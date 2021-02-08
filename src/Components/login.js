@@ -32,12 +32,12 @@ password : ''
 
     handlechange(event)
 {
-console.log(event.target.name)
+
 this.setState( {
        
         [event.target.name] : event.target.value
     })
- 
+ console.log(this.state.login)
 
 }
 validatelogin(){

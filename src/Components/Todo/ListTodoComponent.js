@@ -1,8 +1,13 @@
-import { Tooltip } from 'bootstrap'
+import { Form , Col, Row,Button} from "react-bootstrap";
+import { makeStyles } from '@material-ui/core/styles';
+import Alert from '@material-ui/lab/Alert';
 import React,{Component} from 'react'
 import TodoService from '../../API/TODO/TodoService'
 import AuthenticationService from './AuthenticationService'
 import  Todocomponent from  './Todocomponent'
+import moment from 'moment'
+
+
 
 
 
@@ -19,16 +24,29 @@ export default class ListTodoComponent extends Component{
     
     this.Deletetodo=this.Deletetodo.bind(this);
     this.Updatetodo=this.Updatetodo.bind(this)
+    this.AddTODO=this.AddTODO.bind(this)
      } 
 
     componentDidMount(){
 
       let userName = AuthenticationService.Getusername();
-      console.log(userName);
+      
       TodoService.GetAllTodo(userName)
       .then(response => {
 
-        console.log(response)
+      
+        this.setState({todo : response.data})
+      })
+    }
+
+    componentDidUpdate() {
+
+      let userName = AuthenticationService.Getusername();
+      
+      TodoService.GetAllTodo(userName)
+      .then(response => {
+
+      
         this.setState({todo : response.data})
       })
     }
@@ -36,13 +54,23 @@ export default class ListTodoComponent extends Component{
       let userName = AuthenticationService.Getusername();
  
       TodoService.DeleteTdoService(userName,id)
-      .then(response => {
+      .then( response => {
         
         this.setState({message : `Deleted ${id}`})
         
-        window.location.reload();
       })
      
+    }
+
+
+    AddTODO()
+    { 
+// this.setState({description:'',tagetdate:''})
+
+      this.props.history.push("/Todo/-1")
+     
+       
+      
     }
 
     Updatetodo(id){
@@ -62,8 +90,10 @@ export default class ListTodoComponent extends Component{
         render()
          { 
              return(
-                <div  className='Listtodo'>
-                 {this.state.message && <div className="alert alert-success">{this.state.message}</div>}
+              <div  className='Listtodo'>
+            {this.state.message && 
+    <Alert> my own</Alert>
+ }
                   <table className="table">
       <thead>
         <tr>
@@ -87,8 +117,8 @@ export default class ListTodoComponent extends Component{
           
           <td>{todo.description}</td>
           
-          <td>{todo.tagetdate}</td>
-          <td>{todo.done}</td>
+          <td>{moment(todo.tagetdate).format('YYYY-MM-DD')}</td>
+          <td>{todo.done.toString()}</td>
           <td>    <button  className="btn btn-success" onClick={()=>this.Updatetodo(todo.id)}>
          Update 
         </button>
@@ -103,6 +133,7 @@ export default class ListTodoComponent extends Component{
       
       </tbody>
     </table>
+    <Button  className="float-left"variant="success"  onClick={this.AddTODO}>Add Todo</Button>
           </div>
              );
          }
